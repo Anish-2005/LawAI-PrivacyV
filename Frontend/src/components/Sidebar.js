@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import classNames from 'classnames';
+import classNames from 'classnames'; // Add classnames for conditional styling
 import './component-styles/Sidebar.css';
 import img from '../images/MOE.png';
 import img1 from '../images/indian-emblem.png';
@@ -10,43 +10,31 @@ const Sidebar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [name, setName] = useState('');
   const [badgeNumber, setBadgeNumber] = useState('');
-  const [language, setLanguage] = useState('English');
-  const [professionalMode, setProfessionalMode] = useState(false); // For Professional Mode
+  const [language, setLanguage] = useState('English'); // State to store selected language
 
   useEffect(() => {
-    // Initial Load from localStorage
+    // Retrieve language from localStorage
     const storedLanguage = localStorage.getItem('language');
+    if (storedLanguage) {
+      setLanguage(storedLanguage);
+    }
+
     const storedName = localStorage.getItem('name');
     const storedBadgeNumber = localStorage.getItem('badgeNumber');
-    const storedProfessionalMode = JSON.parse(localStorage.getItem('professionalMode'));
-
-    if (storedLanguage) setLanguage(storedLanguage);
     if (storedName && storedBadgeNumber) {
       setName(storedName);
       setBadgeNumber(storedBadgeNumber);
       setIsLoggedIn(true);
     }
-    if (storedProfessionalMode !== null) setProfessionalMode(storedProfessionalMode);
-
-    // Listen to localStorage changes
-    const handleStorageChange = (e) => {
-      if (e.key === 'professionalMode') {
-        setProfessionalMode(JSON.parse(e.newValue));
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
   }, []);
 
-  // Language change handler
+  // Function to handle language change
   const handleLanguageChange = (e) => {
     const selectedLanguage = e.target.value;
     setLanguage(selectedLanguage);
+    // Save the selected language to localStorage
     localStorage.setItem('language', selectedLanguage);
+    console.log('Selected Language:', selectedLanguage);
   };
 
   return (
@@ -55,7 +43,11 @@ const Sidebar = () => {
         {/* Logo and Title */}
         <div className="container mx-auto px-6 flex justify-between items-center py-2">
           <div className="flex items-center space-x-4 flex-shrink-0">
-            <img src={img1} alt="Emblem of India" className="h-14" />
+            <img
+              src={img1}
+              alt="Emblem of India"
+              className="h-14"
+            />
             <div className="text-left">
               <h1 className="text-lg sm:text-xl md:text-2xl font-bold tracking-wide">
                 <NavLink to="/">LawAI</NavLink>
@@ -68,7 +60,12 @@ const Sidebar = () => {
 
           {/* Right Section */}
           <div className="flex items-center space-x-6">
-            <img src={img} alt="MOE" className="h-12" />
+            {/* Official Emblem */}
+            <img
+              src={img}
+              alt="Emblem of India"
+              className="h-12"
+            />
 
             {/* Help Button */}
             <button
@@ -82,7 +79,7 @@ const Sidebar = () => {
             <select
               className="bg-white text-blue-800 px-4 py-2 rounded-lg text-sm font-semibold shadow-md"
               value={language}
-              onChange={handleLanguageChange}
+              onChange={handleLanguageChange} // Handle language change
             >
               <option value="English">English</option>
               <option value="Hindi">Hindi</option>
@@ -90,6 +87,7 @@ const Sidebar = () => {
               <option value="Tamil">Tamil</option>
               <option value="Telugu">Telugu</option>
               <option value="Marathi">Marathi</option>
+              {/* Add other languages as required */}
             </select>
           </div>
         </div>
@@ -137,17 +135,15 @@ const Sidebar = () => {
                         'Bare Acts'}
           </NavLink>
 
-          {/* Database Link - Conditionally Clickable */}
+          {/* Database Link */}
           <NavLink
-            to={professionalMode ? "/database" : "#"}
+            to="/database"
             className={({ isActive }) =>
               classNames(
-                'text-lg font-medium hover:underline underline-offset-4 transition duration-200',
-                { 'text-yellow-300': isActive },
-                { 'opacity-50 cursor-not-allowed': !professionalMode }
+                'text-lg font-medium hover:text-yellow-300 hover:underline underline-offset-4 transition duration-200',
+                { 'text-yellow-300': isActive }
               )
             }
-            onClick={(e) => !professionalMode && e.preventDefault()}
           >
             {language === 'English' ? 'Database' :
               language === 'Hindi' ? 'डेटाबेस' :
@@ -158,17 +154,15 @@ const Sidebar = () => {
                         'Database'}
           </NavLink>
 
-          {/* FIR Builder Link - Conditionally Clickable */}
+          {/* FIR Builder Link */}
           <NavLink
-            to={professionalMode ? "/fir" : "#"}
+            to="/fir"
             className={({ isActive }) =>
               classNames(
-                'text-lg font-medium hover:underline underline-offset-4 transition duration-200',
-                { 'text-yellow-300': isActive },
-                { 'opacity-50 cursor-not-allowed': !professionalMode }
+                'text-lg font-medium hover:text-yellow-300 hover:underline underline-offset-4 transition duration-200',
+                { 'text-yellow-300': isActive }
               )
             }
-            onClick={(e) => !professionalMode && e.preventDefault()}
           >
             {language === 'English' ? 'FIR Builder' :
               language === 'Hindi' ? 'एफआईआर निर्माता' :
@@ -198,7 +192,7 @@ const Sidebar = () => {
                         'Settings'}
           </NavLink>
 
-          {/* Conditional Avatar or Login */}
+          {/* Conditional Rendering of Avatar or Login */}
           <NavLink
             to="/login"
             className={({ isActive }) =>
